@@ -8,7 +8,14 @@ namespace Exchange
         {
             var random = new Random();
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "exchangeData");
-
+            while (true)
+            {
+                using (StreamWriter file = new StreamWriter(path))
+                {
+                    file.WriteLine(random.Next(0,int.MaxValue));
+                    file.Close();
+                }   
+            }
         }
     }
 }
