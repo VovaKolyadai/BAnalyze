@@ -11,7 +11,7 @@ namespace Exchange
             int value = 0;
             while (true)
             {
-                value = random.Next(0, int.MaxValue);
+                value = random.Next(-100, 100);
                 using(Mutex mutex = new Mutex(false, "ExchangeFileAcces"))
                 {
                     mutex.WaitOne();
@@ -29,7 +29,6 @@ namespace Exchange
                     }
                 }
                 Console.WriteLine(value);
-                Thread.Sleep(500);
             }
         }
     }

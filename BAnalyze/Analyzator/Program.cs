@@ -9,6 +9,7 @@ namespace Analyzator
     {
         static void Main(string[] args)
         {
+            var watch = new System.Diagnostics.Stopwatch();
             var numberFrequency = new ConcurrentDictionary<int, int>();
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "exchangeData");
             var average = 0.0;
@@ -19,6 +20,7 @@ namespace Analyzator
             var count = 0;
             while (true)
             {
+                watch.Start();
                 count++;
                 var statsCalculator = new StatsCalculator();
                 using (var mutex = new Mutex(false, "ExchangeFileAcces"))
@@ -29,7 +31,7 @@ namespace Analyzator
                         using (StreamReader file = new StreamReader(path))
                         {
                             var number = int.Parse(File.ReadAllText(path));
-                            standardDeviation = statsCalculator.CalculateStandardDeviation(average, averageSquare, count, number);//nan problem
+                            standardDeviation = statsCalculator.CalculateStandardDeviation(average, averageSquare, count, number);
                             average = statsCalculator.CalculateAverage(average, count - 1, number);
                             averageSquare = statsCalculator.CalculateAverage(averageSquare, count - 1, number * number);
                             mode = statsCalculator.CalculateMode(numberFrequency, number);
@@ -43,8 +45,10 @@ namespace Analyzator
                     {
                         mutex.ReleaseMutex();
                     }
+                    watch.Stop();
+                    Console.WriteLine($"{watch.ElapsedMilliseconds} ms");
+                    watch.Reset();
                 }
-                Thread.Sleep(500);
             }
         }
     }
