@@ -8,13 +8,28 @@ namespace Exchange
         {
             var random = new Random();
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "exchangeData");
+            int value = 0;
             while (true)
             {
-                using (StreamWriter file = new StreamWriter(path))
+                value = random.Next(0, int.MaxValue);
+                using(Mutex mutex = new Mutex(false, "ExchangeFileAcces"))
                 {
-                    file.WriteLine(random.Next(0,int.MaxValue));
-                    file.Close();
-                }   
+                    mutex.WaitOne();
+                    try
+                    {
+                        using (StreamWriter file = new StreamWriter(path))
+                        {
+                            file.WriteLine(value);
+                            file.Close();
+                        }
+                    }
+                    finally
+                    {
+                        mutex.ReleaseMutex();
+                    }
+                }
+                Console.WriteLine(value);
+                Thread.Sleep(500);
             }
         }
     }
